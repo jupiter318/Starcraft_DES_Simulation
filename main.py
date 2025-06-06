@@ -13,6 +13,8 @@
 # Fastest 는 30% 빠름
 import simpy
 import pandas as pd
+import itertools
+import math
 class CommandCenter(object):
     def __init__(self, env, mineral_container, supply_container):
         self.building_no = 0
@@ -149,20 +151,40 @@ def setup(env, order_string):
                                building_list[0], barracks_store))
             supply_container.put(8)
     # csv_output = csv_output.append({'order': order_string, 'end_time': end_production_time}, ignore_index=True)
-    print(order_string, f"\t{end_production_time}", end='')
+    # print(order_string, f"\t{end_production_time}")
 
+
+def find_best_order(target_marines):
+    """Search build orders to produce the target number of marines."""
+    required_supply = 4 + target_marines
+    depot_count = 0 if required_supply <= 6 else math.ceil((required_supply - 6) / 8)
+    base_items = ['b'] + ['u'] * depot_count + ['m'] * target_marines
+
+    best_time = float('inf')
+    best_order = ''
+
+    for perm in set(itertools.permutations(base_items)):
+        order = ''.join(perm)
+        global end_production_time
+        end_production_time = float('inf')
+        env = simpy.Environment()
+        env.process(setup(env, order))
+        env.run(until=SIM_TIME)
+        if end_production_time < best_time:
+            best_time = end_production_time
+            best_order = order
+
+    print(f"Best order: {best_order} {best_time}")
+    return best_order, best_time
 
 
 # #
-SIM_TIME = 10*30
+SIM_TIME = 10 * 30
 
 end_production_time = 800
-env = simpy.Environment()
-input_string = "bbmmbmmmummm"
-env.process(setup(env, input_string))
-env.run(until=SIM_TIME)
 
-print(f"\t{end_production_time}", end='')
+if __name__ == "__main__":
+    find_best_order(6)
 
 #
 #
