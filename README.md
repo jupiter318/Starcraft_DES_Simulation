@@ -1,7 +1,11 @@
 # Starcraft_DES_Simulation
-DES Simulation of Starcraft 1 game using simpy
 
-----------
-Contributors: 
-Do-yeop Lee,  doyeop.lee@snu.ac.kr
-Won-seok Kang, 
+A discrete event simulation of StarCraft build orders using `simpy`.
+
+## Usage
+
+```
+python -m starcraft.cli 6
+```
+
+This example searches for the fastest order to produce six marines.
